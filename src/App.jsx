@@ -1,8 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
-import { ThemeProvider } from './context/ThemeContext';
-import { LocaleProvider } from './i18n/LocaleContext';
 import ProtectedRoute from './components/ui/ProtectedRoute';
 import AppShell from './components/layout/AppShell';
 import ToastStack from './components/ui/ToastStack';
@@ -19,35 +15,29 @@ import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <LocaleProvider>
-        <ToastProvider>
-          <AuthProvider>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
+    <>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <AppShell />
-                  </ProtectedRoute>
-                }
-              >
-                <Route path="/" element={<DashboardPage />} />
-                <Route path="/create" element={<CreateJobPage />} />
-                <Route path="/jobs/:id" element={<JobDetailPage />} />
-                <Route path="/bracelets" element={<BraceletsPage />} />
-                <Route path="/bracelets/:id" element={<BraceletDetailPage />} />
-                <Route path="/reconciliation" element={<ReconciliationPage />} />
-              </Route>
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppShell />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/create" element={<CreateJobPage />} />
+          <Route path="/jobs/:id" element={<JobDetailPage />} />
+          <Route path="/bracelets" element={<BraceletsPage />} />
+          <Route path="/bracelets/:id" element={<BraceletDetailPage />} />
+          <Route path="/reconciliation" element={<ReconciliationPage />} />
+        </Route>
 
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-            <ToastStack />
-          </AuthProvider>
-        </ToastProvider>
-      </LocaleProvider>
-    </ThemeProvider>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      <ToastStack />
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { simulateLatency, maybeThrowNetworkError, ApiError } from './client';
+import { simulateLatency, maybeThrowNetworkError, ApiError } from './client.js';
 import {
   jobs,
   bracelets,
@@ -7,8 +7,9 @@ import {
   getTodayCreatedCount,
   writeEvent,
   nextId,
-} from './mockData';
-import { BRACELET_STATUS, JOB_STATUS, MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH } from '../utils/constants';
+  persistStore,
+} from './mockData.js';
+import { BRACELET_STATUS, JOB_STATUS, MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH } from '../utils/constants.js';
 
 export function getOperatorLabel(operatorId) {
   const job = jobs.find((j) => j.requestedBy === operatorId);
@@ -101,6 +102,7 @@ export async function createJob({ quantity, operatorId, operatorName, idempotenc
     });
   });
 
+  persistStore();
   runJobPipeline(job);
   return summarizeJob(job);
 }

@@ -22,14 +22,8 @@ export const JOB_STATUS = {
   FAILED: 'FAILED',
 };
 
-// §4 — one CreationJob may request between 1 and 50 guests.
-export const MAX_GUESTS_PER_JOB = 50;
-
-// Product-brief business rule (not in KODE-TECH-0001), stricter than the
-// architecture cap above: each *batch* (one creation request) is capped at
-// 30 bracelets. This is NOT a lifetime limit and NOT a daily limit — an
-// operator can create as many batches as they like, and the cap resets
-// fresh every time Create Guest Bracelet is opened.
+// Maximum number of bracelets a security employee can create in ONE batch is 30.
+export const MAX_GUESTS_PER_JOB = 30;
 export const MAX_BRACELETS_PER_BATCH = 30;
 
 // §7.4 — stuck-job thresholds, used to decide when to show "taking longer

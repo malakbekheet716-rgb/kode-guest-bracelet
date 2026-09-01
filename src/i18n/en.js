@@ -1,15 +1,480 @@
 export default {
-  common: { appName: 'KODE Guest Bracelet System', appSubtitle: 'Guest Bracelet System', loading: 'Loading…', save: 'Save', cancel: 'Cancel', confirm: 'Confirm', close: 'Close', back: 'Back', previous: 'Previous', next: 'Next', retry: 'Retry', submit: 'Submit', search: 'Search', filter: 'Filter', clear: 'Clear', actions: 'Actions', status: 'Status', date: 'Date', none: 'None', yes: 'Yes', no: 'No', viewDetails: 'View details', requiredField: 'Required', demoModeNotice: 'Running against mock data — no live backend connected yet.' },
-  nav: { dashboard: 'Dashboard', createJob: 'Create Guest Bracelet', bracelets: 'History', reconciliation: 'Reconciliation', logout: 'Log out', language: 'العربية', signedInAs: 'Operator' },
-  auth: { loginTitle: 'Operator sign in', loginSubtitle: 'Enter your name and Employee ID to record who is issuing guest bracelets.', employeeName: 'Employee name', employeeId: 'Employee ID', loginButton: 'Continue', loggingIn: 'Continuing…', sharedLoginHint: 'One shared system account is used. Your Employee ID identifies every job and audit event you perform.', signupTitle: 'Request operator access', signupSubtitle: 'Individual operator accounts are not required.', fullName: 'Full name', confirmPassword: 'Confirm password', signupButton: 'Request access', signingUp: 'Submitting…', haveAccount: 'Already have an account?', noAccount: '', goToSignup: '', goToLogin: 'Sign in', signupSuccessTitle: 'Request received', signupSuccessBody: 'Individual accounts are not required.', backToLogin: 'Back to sign in', sessionExpired: 'Your session expired. Please sign in again.' },
-  dashboard: { title: 'Dashboard', welcomeBack: 'Welcome back, {{name}}', created: 'Total Created', todayCreated: "Today's Created", remaining: 'Remaining', max: 'Maximum per batch', createCta: 'Create Guest Bracelet', limitReachedBanner: 'A maximum of {{max}} bracelets can be created in one batch.', recentJobs: 'Recent jobs', viewAllJobs: 'View all in history', noJobs: 'No jobs yet. Create your first guest bracelet job to get started.', needsAttentionTitle: 'Needs attention', needsAttentionEmpty: 'Nothing needs attention right now.', needsAttentionCount: '{{count}} item(s) need review' },
-  createJob: { title: 'Create Guest Bracelet', subtitle: 'Enter how many guest bracelets to issue right now.', quantityLabel: 'Number of bracelets', quantityHelp: 'Up to {{max}} bracelets per batch. There is no daily creation limit.', remainingNote: '', submitButton: 'Create job', submitting: 'Creating job…', successTitle: 'Job created', successBody: 'Job for {{quantity}} bracelet(s) was created and dispatched by {{name}} ({{employeeId}}).', viewJob: 'View job status', backToDashboard: 'Back to dashboard', errorTitle: "Couldn't create job", limitExceeded: 'Maximum {{max}} bracelets per batch.' },
-  jobDetail: { title: 'Job', jobId: 'Job ID', requestedBy: 'Created by', quantity: 'Quantity', createdAt: 'Created', status: 'Status', guestsBreakdown: 'Guest outcomes', issued: 'Issued', failed: 'Failed', reconciliationRequired: 'Needs reconciliation', pending: 'Pending', queued: 'Queued', takingLonger: 'This is taking longer than expected. It will keep processing in the background.', needsAttentionFlag: 'Flagged for review — this job has been stuck longer than usual.', retryDispatch: 'Retry dispatch', backToBracelets: 'View bracelets from this job', dispatchFailedNote: 'The dispatch to the issuance workflow failed after 3 attempts.', viewBracelet: 'View', braceletNumber: 'Bracelet #' },
-  bracelets: { title: 'Bracelet history', searchPlaceholder: 'Search by bracelet number…', filterStatus: 'Status', allStatuses: 'All statuses', braceletNumber: 'Bracelet #', jobIdCol: 'Job', statusCol: 'Status', updatedAt: 'Last updated', empty: 'No bracelets yet.', noResults: 'No bracelets match your search.' },
-  braceletDetail: { title: 'Bracelet', braceletNumber: 'Bracelet number', braceletCode: 'Bracelet code', status: 'Status', job: 'Job', issuedAt: 'Issued at', activatedAt: 'Activated at', revokedAt: 'Revoked at', lastError: 'Last error', eventHistory: 'Event history', noEvents: 'No events recorded yet.', actions: 'Actions', retryButton: 'Retry issuance', retryConfirmTitle: 'Retry this bracelet?', retryConfirmBody: 'This will re-queue the bracelet into a new job.', reconcileButton: 'Resolve reconciliation', reconcileTitle: 'Resolve reconciliation', reconcileBody: 'Check the PayMob admin portal for this bracelet number, then confirm the outcome below.', reconcileExists: 'Confirmed — exists in PayMob', reconcileMissing: 'Confirmed — missing from PayMob', reconcileWarning: 'Never guess. An incorrect confirmation can create a duplicate or an orphaned bracelet.', markActive: 'Mark active', markLost: 'Mark lost', markRevoked: 'Revoke', adminOnly: 'Admin only', confirmRevokeTitle: 'Revoke this bracelet?', confirmRevokeBody: 'This action is permanent and will be recorded in the audit log.' },
-  reconciliation: { title: 'Reconciliation queue', subtitle: 'Bracelets with an unconfirmed outcome from PayMob. Check the admin portal before resolving.', empty: 'Nothing needs reconciliation right now.' },
-  statuses: { PENDING: 'Pending', QUEUED: 'Queued', ISSUED: 'Issued', FAILED: 'Failed', RECONCILIATION_REQUIRED: 'Needs reconciliation', ACTIVE: 'Active', REVOKED: 'Revoked', LOST: 'Lost', QUARANTINED: 'Quarantined' },
-  jobStatuses: { QUEUED: 'Queued', IN_PROGRESS: 'In progress', COMPLETED: 'Completed', COMPLETED_WITH_ERRORS: 'Completed with errors', FAILED: 'Failed' },
-  toast: { jobCreated: 'Job created successfully.', jobCreateFailed: "Couldn't create the job. Please try again.", retryQueued: 'Bracelet re-queued for issuance.', reconcileResolved: 'Reconciliation resolved.', statusUpdated: 'Status updated.', loggedOut: 'You have been logged out.', copied: 'Copied to clipboard.' },
-  errors: { generic: 'Something went wrong. Please try again.', network: 'Network error. Check your connection and try again.', notFound: 'Not found.', required: 'This field is required.', invalidEmail: 'Enter a valid email address.', passwordTooShort: 'Password must be at least 6 characters.', passwordMismatch: 'Passwords do not match.', invalidQuantity: 'Enter a whole number.', quantityTooLow: 'Enter at least 1.', quantityTooHigh: 'Maximum {{max}} bracelets per batch.' }
+  common: {
+    appName: 'KODE Guest Bracelet System',
+    appSubtitle: 'Guest Bracelet System',
+    loading: 'Loading…',
+    save: 'Save',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    close: 'Close',
+    back: 'Back',
+    previous: 'Previous',
+    next: 'Next',
+    retry: 'Retry',
+    submit: 'Submit',
+    search: 'Search',
+    filter: 'Filter',
+    clear: 'Clear',
+    actions: 'Actions',
+    status: 'Status',
+    date: 'Date',
+    none: 'None',
+    yes: 'Yes',
+    no: 'No',
+    viewDetails: 'View details',
+    requiredField: 'Required',
+
+    demoModeNotice:
+      'Running against mock data — no live backend connected yet.',
+  },
+
+  nav: {
+    dashboard: 'Dashboard',
+    createJob: 'Create Guest Bracelet',
+    bracelets: 'History',
+    reconciliation: 'Reconciliation',
+    logout: 'Log out',
+    language: 'العربية',
+    signedInAs: 'Signed in as',
+  },
+
+  auth: {
+    loginTitle: 'Operator sign in',
+
+    loginSubtitle:
+      'Enter your name and Employee ID to record who is issuing guest bracelets.',
+
+    employeeName: 'Employee name',
+
+    employeeId: 'Employee ID',
+
+    loginButton: 'Sign in',
+
+    loggingIn: 'Signing in…',
+
+    sharedLoginHint:
+      'One shared system account is used. Your Employee ID identifies every job and audit event you perform.',
+
+    signupTitle:
+      'Request operator access',
+
+    signupSubtitle:
+      'Individual operator accounts are not required. Use your name and Employee ID to sign in.',
+
+    fullName: 'Full name',
+
+    confirmPassword:
+      'Confirm password',
+
+    signupButton:
+      'Request access',
+
+    signingUp:
+      'Submitting…',
+
+    haveAccount:
+      'Already have an account?',
+
+    noAccount: '',
+
+    goToSignup: '',
+
+    goToLogin:
+      'Sign in',
+
+    signupSuccessTitle:
+      'Request received',
+
+    signupSuccessBody:
+      'Individual accounts are not required. You can use the shared system login.',
+
+    backToLogin:
+      'Back to sign in',
+
+    sessionExpired:
+      'Your session expired. Please sign in again.',
+  },
+
+  dashboard: {
+    title: 'Dashboard',
+
+    welcomeBack:
+      'Welcome back, {{name}}',
+
+    created:
+      'Total Created',
+
+    todayCreated:
+      "Today's Created",
+
+    remaining:
+      'Remaining',
+
+    max:
+      'Maximum per batch',
+
+    createCta:
+      'Create Guest Bracelet',
+
+    limitReachedBanner:
+      'You have reached the maximum of {{max}} bracelets per batch.',
+
+    recentJobs:
+      'Recent jobs',
+
+    viewAllJobs:
+      'View all in history',
+
+    noJobs:
+      'No jobs yet. Create your first guest bracelet job to get started.',
+
+    needsAttentionTitle:
+      'Needs attention',
+
+    needsAttentionEmpty:
+      'Nothing needs attention right now.',
+
+    needsAttentionCount:
+      '{{count}} item(s) need review',
+  },
+
+  createJob: {
+    title:
+      'Create Guest Bracelet',
+
+    subtitle:
+      'Enter how many guest bracelets to issue right now.',
+
+    quantityLabel:
+      'Number of bracelets',
+
+    quantityHelp:
+      'Up to {{max}} bracelets per batch.',
+
+    remainingNote:
+      'You can create {{remaining}} more bracelets out of your allowance of {{max}}.',
+
+    batchLimit:
+      'Maximum per batch',
+
+    decrease:
+      'Decrease quantity',
+
+    increase:
+      'Increase quantity',
+
+    submitButton:
+      'Create job',
+
+    submitting:
+      'Creating job…',
+
+    successTitle:
+      'Job created successfully',
+
+    successBody:
+      'A job for {{quantity}} bracelet(s) was created by {{name}} ({{employeeId}}).',
+
+    viewJob:
+      'View job status',
+
+    backToDashboard:
+      'Back to dashboard',
+
+    errorTitle:
+      "Couldn't create job",
+
+    limitExceeded:
+      'This exceeds your remaining allowance of {{remaining}} bracelets.',
+  },
+
+  jobDetail: {
+    title: 'Job',
+
+    jobId: 'Job ID',
+
+    requestedBy:
+      'Requested by',
+
+    quantity:
+      'Quantity',
+
+    createdAt:
+      'Created',
+
+    status:
+      'Status',
+
+    guestsBreakdown:
+      'Guest outcomes',
+
+    issued:
+      'Issued',
+
+    failed:
+      'Failed',
+
+    reconciliationRequired:
+      'Needs reconciliation',
+
+    pending:
+      'Pending',
+
+    queued:
+      'Queued',
+
+    takingLonger:
+      'This is taking longer than expected. It will keep processing in the background.',
+
+    needsAttentionFlag:
+      'Flagged for review — this job has been stuck longer than usual.',
+
+    retryDispatch:
+      'Retry dispatch',
+
+    backToBracelets:
+      'View bracelets from this job',
+
+    dispatchFailedNote:
+      'The dispatch to the issuance workflow failed after 3 attempts.',
+
+    viewBracelet:
+      'View',
+
+    braceletNumber:
+      'Bracelet #',
+  },
+
+  bracelets: {
+    title:
+      'Bracelet history',
+
+    searchPlaceholder:
+      'Search by bracelet number…',
+
+    filterStatus:
+      'Status',
+
+    allStatuses:
+      'All statuses',
+
+    braceletNumber:
+      'Bracelet #',
+
+    jobIdCol:
+      'Job',
+
+    statusCol:
+      'Status',
+
+    updatedAt:
+      'Last updated',
+
+    empty:
+      'No bracelets yet.',
+
+    noResults:
+      'No bracelets match your search.',
+  },
+
+  braceletDetail: {
+    title:
+      'Bracelet',
+
+    braceletNumber:
+      'Bracelet number',
+
+    braceletCode:
+      'Bracelet code',
+
+    status:
+      'Status',
+
+    job:
+      'Job',
+
+    issuedAt:
+      'Issued at',
+
+    activatedAt:
+      'Activated at',
+
+    revokedAt:
+      'Revoked at',
+
+    lastError:
+      'Last error',
+
+    eventHistory:
+      'Event history',
+
+    noEvents:
+      'No events recorded yet.',
+
+    actions:
+      'Actions',
+
+    retryButton:
+      'Retry issuance',
+
+    retryConfirmTitle:
+      'Retry this bracelet?',
+
+    retryConfirmBody:
+      'This will re-queue the bracelet into a new job.',
+
+    reconcileButton:
+      'Resolve reconciliation',
+
+    reconcileTitle:
+      'Resolve reconciliation',
+
+    reconcileBody:
+      'Check the PayMob admin portal for this bracelet number, then confirm the outcome below.',
+
+    reconcileExists:
+      'Confirmed — exists in PayMob',
+
+    reconcileMissing:
+      'Confirmed — missing from PayMob',
+
+    reconcileWarning:
+      'Never guess. An incorrect confirmation can create a duplicate or an orphaned bracelet.',
+
+    markActive:
+      'Mark active',
+
+    markLost:
+      'Mark lost',
+
+    markRevoked:
+      'Revoke',
+
+    adminOnly:
+      'Admin only',
+
+    confirmRevokeTitle:
+      'Revoke this bracelet?',
+
+    confirmRevokeBody:
+      'This action is permanent and will be recorded in the audit log.',
+  },
+
+  reconciliation: {
+    title:
+      'Reconciliation queue',
+
+    subtitle:
+      'Bracelets with an unconfirmed outcome from PayMob. Check the admin portal before resolving.',
+
+    empty:
+      'Nothing needs reconciliation right now.',
+  },
+
+  statuses: {
+    PENDING:
+      'Pending',
+
+    QUEUED:
+      'Queued',
+
+    ISSUED:
+      'Issued',
+
+    FAILED:
+      'Failed',
+
+    RECONCILIATION_REQUIRED:
+      'Needs reconciliation',
+
+    ACTIVE:
+      'Active',
+
+    REVOKED:
+      'Revoked',
+
+    LOST:
+      'Lost',
+
+    QUARANTINED:
+      'Quarantined',
+  },
+
+  jobStatuses: {
+    QUEUED:
+      'Queued',
+
+    IN_PROGRESS:
+      'In progress',
+
+    COMPLETED:
+      'Completed',
+
+    COMPLETED_WITH_ERRORS:
+      'Completed with errors',
+
+    FAILED:
+      'Failed',
+  },
+
+  toast: {
+    jobCreated:
+      'Job created successfully.',
+
+    jobCreateFailed:
+      "Couldn't create the job. Please try again.",
+
+    retryQueued:
+      'Bracelet re-queued for issuance.',
+
+    reconcileResolved:
+      'Reconciliation resolved.',
+
+    statusUpdated:
+      'Status updated.',
+
+    loggedOut:
+      'You have been logged out.',
+
+    copied:
+      'Copied to clipboard.',
+  },
+
+  errors: {
+    generic:
+      'Something went wrong. Please try again.',
+
+    network:
+      'Network error. Check your connection and try again.',
+
+    notFound:
+      'The requested item was not found.',
+
+    required:
+      'This field is required.',
+
+    invalidEmail:
+      'Enter a valid email address.',
+
+    passwordTooShort:
+      'Password must be at least 6 characters.',
+
+    passwordMismatch:
+      'Passwords do not match.',
+
+    invalidQuantity:
+      'Enter a whole number.',
+
+    quantityTooLow:
+      'Enter at least 1.',
+
+    quantityTooHigh:
+      'Maximum {{max}} bracelets can be created at once.',
+
+    insufficientGuests:
+      'There are not enough available bracelets. Currently available: {{count}}.',
+
+    sessionNotFound:
+      'No valid login session was found. Please sign in again.',
+  },
 };

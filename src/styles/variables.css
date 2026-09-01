@@ -21,8 +21,8 @@
   --color-success: var(--color-lime);
 
   /* Type */
-  --font-display: 'Archivo', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
-  --font-body: 'IBM Plex Sans', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  --font-display: 'Montserrat', 'Archivo', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  --font-body: 'Montserrat', 'IBM Plex Sans', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
 
   /* Scale */
   --radius-sm: 6px;

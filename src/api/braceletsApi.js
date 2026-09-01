@@ -1,6 +1,6 @@
-import { simulateLatency, maybeThrowNetworkError, ApiError } from './client';
-import { bracelets, events, jobs, writeEvent, runJobPipeline, nextId } from './mockData';
-import { BRACELET_STATUS, JOB_STATUS, ROLES } from '../utils/constants';
+import { simulateLatency, maybeThrowNetworkError, ApiError } from './client.js';
+import { bracelets, events, jobs, writeEvent, runJobPipeline, nextId, persistStore } from './mockData.js';
+import { BRACELET_STATUS, JOB_STATUS, ROLES } from '../utils/constants.js';
 
 // Real endpoint: GET /api/v1/bracelets
 export async function getBracelets({ status, jobId, braceletNumber, page = 1, pageSize = 20 } = {}) {
@@ -91,9 +91,8 @@ export async function reconcileBracelet(id, outcome, operatorId, operatorName) {
     bracelet.jobId = null;
     bracelet.lastIssueError = null;
     writeEvent({ braceletId: bracelet.id, eventType: 'RECONCILIATION_CONFIRMED_MISSING', oldStatus, newStatus: BRACELET_STATUS.PENDING, triggeredBy: `user:${employeeId}`, triggeredByName: employeeName, employeeId });
-  } else {
-    throw new ApiError('VALIDATION_ERROR', 'Unknown reconciliation outcome.', 400);
   }
+  persistStore();
   return { ...bracelet };
 }
 
@@ -123,5 +122,6 @@ export async function updateBraceletStatus(id, newStatus, { operatorId, operator
   if (newStatus === BRACELET_STATUS.ACTIVE) bracelet.activatedAt = new Date().toISOString();
   if (newStatus === BRACELET_STATUS.REVOKED) bracelet.revokedAt = new Date().toISOString();
   writeEvent({ braceletId: bracelet.id, eventType: 'MANUAL_STATUS_CHANGE', oldStatus, newStatus, triggeredBy: `user:${employeeId}`, triggeredByName: employeeName, employeeId });
+  persistStore();
   return { ...bracelet };
 }

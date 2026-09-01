@@ -20,15 +20,18 @@ export default function DashboardPage() {
   const [jobs, setJobs] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const employeeId = operator?.employeeId || operator?.id;
+
   const load = useCallback(async () => {
+    if (!employeeId) return;
     const [statsRes, jobsRes] = await Promise.all([
-      jobsApi.getCreationStats(operator.id),
-      jobsApi.getJobs({ requestedBy: operator.id, page: 1, pageSize: 100 }),
+      jobsApi.getCreationStats(employeeId),
+      jobsApi.getJobs({ requestedBy: employeeId, page: 1, pageSize: 100 }),
     ]);
     setStats(statsRes);
     setJobs(jobsRes.items);
     setLoading(false);
-  }, [operator.id]);
+  }, [employeeId]);
 
   useEffect(() => {
     load();
@@ -42,7 +45,14 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="page-header">
-        <h1>{t('dashboard.welcomeBack', { name: operator.name })}</h1>
+        <div className="page-header__row">
+          <div>
+            <h1>{t('dashboard.welcomeBack', { name: operator?.name || '' })}</h1>
+            <p className="text-muted text-sm">
+              {t('auth.employeeId')}: <strong>{employeeId}</strong>
+            </p>
+          </div>
+        </div>
       </div>
 
       {loading ? (
@@ -50,8 +60,8 @@ export default function DashboardPage() {
       ) : (
         <>
           <div className="stat-grid">
-            <StatCard label={t('dashboard.todayCreated')} value={stats.today} color="var(--color-blue)" />
-            <StatCard label={t('dashboard.created')} value={stats.total} color="var(--color-lime)" />
+            <StatCard label={t('dashboard.todayCreated')} value={stats?.today ?? 0} color="var(--color-blue)" />
+            <StatCard label={t('dashboard.created')} value={stats?.total ?? 0} color="var(--color-lime)" />
           </div>
 
           <div className="mt-4" style={{ marginBottom: 'var(--space-6)' }}>
@@ -84,13 +94,13 @@ export default function DashboardPage() {
           <div className="section">
             <div className="page-header__row">
               <div className="section__title">{t('dashboard.recentJobs')}</div>
-              {jobs.length > 0 && (
+              {jobs && jobs.length > 0 && (
                 <Button variant="ghost" size="sm" onClick={() => navigate('/bracelets')}>
                   {t('dashboard.viewAllJobs')}
                 </Button>
               )}
             </div>
-            {recentJobs.length === 0 ? (
+            {!jobs || recentJobs.length === 0 ? (
               <EmptyState title={t('dashboard.noJobs')} />
             ) : (
               <JobTable items={recentJobs} />
