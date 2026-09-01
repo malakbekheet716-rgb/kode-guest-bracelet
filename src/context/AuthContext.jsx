@@ -21,16 +21,10 @@ export function AuthProvider({ children }) {
   const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
-    if (session) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
+    if (session) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    else window.localStorage.removeItem(STORAGE_KEY);
   }, [session]);
 
-  // §6.3 — no refresh token; on expiry the frontend must redirect to login,
-  // never silently retry with a stale token. Checked on an interval since
-  // there's no server round-trip in the mock to surface a 401 naturally.
   useEffect(() => {
     if (!session) return undefined;
     const interval = setInterval(() => {
@@ -42,40 +36,30 @@ export function AuthProvider({ children }) {
     return () => clearInterval(interval);
   }, [session]);
 
-  const login = useCallback(async (email, password) => {
-    const result = await authApi.login({ email, password });
+  const login = useCallback(async (name, employeeId) => {
+    const result = await authApi.login({ name, employeeId });
     setSessionExpired(false);
-    setSession({
-      token: result.token,
-      expiresAt: result.expiresAt,
-      operator: result.operator,
-    });
+    setSession({ token: result.token, expiresAt: result.expiresAt, operator: result.operator });
     return result.operator;
   }, []);
 
-  const logout = useCallback(() => {
-    setSession(null);
-  }, []);
-
+  const logout = useCallback(() => setSession(null), []);
   const clearSessionExpired = useCallback(() => setSessionExpired(false), []);
 
-  const value = useMemo(
-    () => ({
-      operator: session?.operator || null,
-      isAuthenticated: Boolean(session),
-      sessionExpired,
-      login,
-      logout,
-      clearSessionExpired,
-    }),
-    [session, sessionExpired, login, logout, clearSessionExpired]
-  );
+  const value = useMemo(() => ({
+    operator: session?.operator || null,
+    isAuthenticated: Boolean(session),
+    sessionExpired,
+    login,
+    logout,
+    clearSessionExpired,
+  }), [session, sessionExpired, login, logout, clearSessionExpired]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }

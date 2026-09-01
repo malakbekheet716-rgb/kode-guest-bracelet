@@ -1,47 +1,34 @@
 import { simulateLatency, ApiError } from './client';
-import { findOperator, pendingSignupRequests, nextId } from './mockData';
+import { nextId } from './mockData';
 import { TOKEN_TTL_MS } from '../utils/constants';
 
-// Real endpoint: POST /api/v1/auth/login
-// Body: { email, password } -> { token, expiresIn: 43200, role }
-export async function login({ email, password }) {
-  await simulateLatency(300, 700);
+// Shared operator account: the login identifies the person performing the work
+// by Employee ID + name. There is intentionally no separate account per employee.
+export async function login({ name, employeeId }) {
+  await simulateLatency(250, 500);
 
-  const operator = findOperator({ email });
-  if (!operator || operator.password !== password) {
-    throw new ApiError('UNAUTHENTICATED', 'Incorrect email or password.', 401);
+  const cleanName = String(name || '').trim();
+  const cleanEmployeeId = String(employeeId || '').trim();
+
+  if (!cleanName || !cleanEmployeeId) {
+    throw new ApiError('VALIDATION_ERROR', 'Employee name and Employee ID are required.', 400);
   }
 
   return {
     token: `mock.${nextId('jwt')}.token`,
     expiresAt: Date.now() + TOKEN_TTL_MS,
     operator: {
-      id: operator.id,
-      name: operator.name,
-      email: operator.email,
-      role: operator.role,
+      id: cleanEmployeeId,
+      employeeId: cleanEmployeeId,
+      name: cleanName,
+      email: null,
+      role: 'operator',
     },
   };
 }
 
-// Not a documented endpoint in KODE-TECH-0001 — the architecture assumes a
-// small, pre-provisioned Operator table. This simulates a "request access"
-// flow that an admin would approve, so the UI has somewhere real to send
-// this request once that workflow exists on the backend.
-export async function requestSignup({ name, email, password }) {
-  await simulateLatency(300, 700);
-
-  if (findOperator({ email })) {
-    throw new ApiError('CONFLICT', 'An account with this email already exists.', 409);
-  }
-
-  pendingSignupRequests.push({
-    id: nextId('req'),
-    name,
-    email,
-    password,
-    requestedAt: new Date().toISOString(),
-  });
-
-  return { received: true };
+// Kept for compatibility with the existing route. The system now uses one
+// shared account, so employee-specific accounts are no longer provisioned here.
+export async function requestSignup() {
+  throw new ApiError('VALIDATION_ERROR', 'Individual operator accounts are not required. Use the shared login.', 400);
 }

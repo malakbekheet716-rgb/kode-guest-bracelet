@@ -2,7 +2,6 @@ import { simulateLatency, maybeThrowNetworkError, ApiError } from './client';
 import {
   jobs,
   bracelets,
-  findOperator,
   claimPendingGuests,
   runJobPipeline,
   getTodayCreatedCount,
@@ -12,66 +11,52 @@ import {
 import { BRACELET_STATUS, JOB_STATUS, MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH } from '../utils/constants';
 
 export function getOperatorLabel(operatorId) {
-  const operator = findOperator({ id: operatorId });
-  return operator ? operator.name : operatorId;
+  const job = jobs.find((j) => j.requestedBy === operatorId);
+  return job?.requestedByName ? `${job.requestedByName} (${operatorId})` : operatorId;
 }
 
-// Product-brief business rules (not in KODE-TECH-0001), both surfaced here:
-// - a per-batch cap (MAX_BRACELETS_PER_BATCH), enforced fresh on every
-//   createJob call — not a lifetime or daily limit;
-// - "today" / "total" creation counts, computed from job history so they
-//   survive a refresh rather than relying on client-side state. Ready to
-//   be swapped for a real GET /api/v1/operators/:id/stats-style endpoint.
-export async function getCreationStats(operatorId) {
+export async function getCreationStats(employeeId) {
   await simulateLatency(80, 180);
-  const operator = findOperator({ id: operatorId });
+  const total = jobs
+    .filter((j) => j.requestedBy === employeeId)
+    .reduce((sum, j) => sum + j.quantity, 0);
   return {
-    today: getTodayCreatedCount(operatorId),
-    total: operator ? operator.braceletsCreated : 0,
+    today: getTodayCreatedCount(employeeId),
+    total,
     maxPerBatch: Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH),
   };
 }
 
 function summarizeJob(job) {
   const guests = bracelets.filter((b) => b.jobId === job.id);
-  const counts = {
-    pending: 0,
-    queued: 0,
-    issued: 0,
-    failed: 0,
-    reconciliationRequired: 0,
-  };
+  const counts = { pending: 0, queued: 0, issued: 0, failed: 0, reconciliationRequired: 0 };
   guests.forEach((g) => {
     if (g.status === BRACELET_STATUS.QUEUED) counts.queued += 1;
-    else if ([BRACELET_STATUS.ISSUED, BRACELET_STATUS.ACTIVE, BRACELET_STATUS.REVOKED, BRACELET_STATUS.LOST].includes(g.status))
-      counts.issued += 1;
+    else if ([BRACELET_STATUS.ISSUED, BRACELET_STATUS.ACTIVE, BRACELET_STATUS.REVOKED, BRACELET_STATUS.LOST].includes(g.status)) counts.issued += 1;
     else if (g.status === BRACELET_STATUS.FAILED) counts.failed += 1;
     else if (g.status === BRACELET_STATUS.RECONCILIATION_REQUIRED) counts.reconciliationRequired += 1;
     else counts.pending += 1;
   });
   return {
     ...job,
+    createdBy: { employeeId: job.requestedBy, name: job.requestedByName },
     guestCounts: counts,
     guestIds: guests.map((g) => g.id),
-    // The IDs this batch actually claimed, straight from the mock
-    // "database" — never generated in this file, never in React. Swap for
-    // whatever the real POST /api/v1/jobs response returns.
     braceletNumbers: guests.map((g) => g.braceletNumber),
   };
 }
 
-// Real endpoint: POST /api/v1/jobs (Idempotency-Key header required)
-export async function createJob({ quantity, operatorId, idempotencyKey }) {
+export async function createJob({ quantity, operatorId, operatorName, idempotencyKey }) {
   await simulateLatency(400, 900);
   maybeThrowNetworkError(0.04);
 
-  const operator = findOperator({ id: operatorId });
-  if (!operator) throw new ApiError('UNAUTHENTICATED', 'Session not found.', 401);
+  const employeeId = String(operatorId || '').trim();
+  const employeeName = String(operatorName || '').trim();
+  if (!employeeId || !employeeName) throw new ApiError('UNAUTHENTICATED', 'Employee identity is required.', 401);
 
   const existing = jobs.find((j) => j.idempotencyKey === idempotencyKey);
   if (existing) return summarizeJob(existing);
 
-  // Per-batch cap only — deliberately no lifetime or daily check here.
   const batchMax = Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH);
   if (quantity < 1 || quantity > batchMax) {
     throw new ApiError('BATCH_LIMIT_EXCEEDED', `Quantity must be between 1 and ${batchMax} per batch.`, 409);
@@ -79,11 +64,7 @@ export async function createJob({ quantity, operatorId, idempotencyKey }) {
 
   const claimed = claimPendingGuests(quantity);
   if (claimed.length < quantity) {
-    throw new ApiError(
-      'INSUFFICIENT_GUESTS',
-      `Only ${claimed.length} pending guests available.`,
-      409
-    );
+    throw new ApiError('INSUFFICIENT_GUESTS', `Only ${claimed.length} pending guests available.`, 409);
   }
 
   const job = {
@@ -91,7 +72,8 @@ export async function createJob({ quantity, operatorId, idempotencyKey }) {
     quantity,
     status: JOB_STATUS.QUEUED,
     idempotencyKey: idempotencyKey || nextId('idem'),
-    requestedBy: operator.id,
+    requestedBy: employeeId,
+    requestedByName: employeeName,
     triggerAttempts: 0,
     lastTriggerAttemptAt: null,
     lastTriggerError: null,
@@ -111,19 +93,16 @@ export async function createJob({ quantity, operatorId, idempotencyKey }) {
       eventType: 'CLAIMED_INTO_JOB',
       oldStatus,
       newStatus: BRACELET_STATUS.QUEUED,
-      triggeredBy: `user:${operator.id}`,
+      triggeredBy: `user:${employeeId}`,
+      triggeredByName: employeeName,
+      employeeId,
     });
   });
 
-  // Lifetime "Total Created" stat only — never enforced as a limit anywhere.
-  operator.braceletsCreated += quantity;
-
   runJobPipeline(job);
-
   return summarizeJob(job);
 }
 
-// Real endpoint: GET /api/v1/jobs
 export async function getJobs({ requestedBy, status, needsAttention, page = 1, pageSize = 10 } = {}) {
   await simulateLatency(150, 400);
   let list = [...jobs];
@@ -131,13 +110,10 @@ export async function getJobs({ requestedBy, status, needsAttention, page = 1, p
   if (status) list = list.filter((j) => j.status === status);
   if (needsAttention) list = list.filter((j) => j.needsAttention);
   list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
   const start = (page - 1) * pageSize;
-  const pageItems = list.slice(start, start + pageSize).map(summarizeJob);
-  return { items: pageItems, total: list.length, page, pageSize };
+  return { items: list.slice(start, start + pageSize).map(summarizeJob), total: list.length, page, pageSize };
 }
 
-// Real endpoint: GET /api/v1/jobs/:id
 export async function getJob(id) {
   await simulateLatency(120, 300);
   const job = jobs.find((j) => j.id === id);
@@ -145,22 +121,16 @@ export async function getJob(id) {
   return summarizeJob(job);
 }
 
-// Manual re-dispatch after a FAILED (dispatch-exhausted) job — §7.3/§7.4.
 export async function retryJobDispatch(id) {
   await simulateLatency(300, 600);
   maybeThrowNetworkError(0.03);
-
   const job = jobs.find((j) => j.id === id);
   if (!job) throw new ApiError('NOT_FOUND', 'Job not found.', 404);
-  if (job.status !== JOB_STATUS.FAILED) {
-    throw new ApiError('INVALID_STATUS_TRANSITION', 'Only a failed dispatch can be retried.', 409);
-  }
-
+  if (job.status !== JOB_STATUS.FAILED) throw new ApiError('INVALID_STATUS_TRANSITION', 'Only a failed dispatch can be retried.', 409);
   job.status = JOB_STATUS.QUEUED;
   job.triggerAttempts = 0;
   job.needsAttention = false;
   job.updatedAt = new Date().toISOString();
   runJobPipeline(job);
-
   return summarizeJob(job);
 }
