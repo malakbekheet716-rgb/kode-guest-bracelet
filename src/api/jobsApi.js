@@ -5,28 +5,30 @@ import {
   findOperator,
   claimPendingGuests,
   runJobPipeline,
+  getTodayCreatedCount,
   writeEvent,
   nextId,
 } from './mockData';
-import { BRACELET_STATUS, JOB_STATUS, MAX_BRACELETS_PER_OPERATOR } from '../utils/constants';
+import { BRACELET_STATUS, JOB_STATUS, MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH } from '../utils/constants';
 
-// Product-brief business rule (not in KODE-TECH-0001): each operator has a
-// running allowance of MAX_BRACELETS_PER_OPERATOR total bracelets created.
-// Tracked here against operator.braceletsCreated, ready to be swapped for a
-// real operator.braceletAllowance field from the backend later.
 export function getOperatorLabel(operatorId) {
   const operator = findOperator({ id: operatorId });
   return operator ? operator.name : operatorId;
 }
 
-export async function getAllowance(operatorId) {
+// Product-brief business rules (not in KODE-TECH-0001), both surfaced here:
+// - a per-batch cap (MAX_BRACELETS_PER_BATCH), enforced fresh on every
+//   createJob call — not a lifetime or daily limit;
+// - "today" / "total" creation counts, computed from job history so they
+//   survive a refresh rather than relying on client-side state. Ready to
+//   be swapped for a real GET /api/v1/operators/:id/stats-style endpoint.
+export async function getCreationStats(operatorId) {
   await simulateLatency(80, 180);
   const operator = findOperator({ id: operatorId });
-  const created = operator ? operator.braceletsCreated : 0;
   return {
-    created,
-    max: MAX_BRACELETS_PER_OPERATOR,
-    remaining: Math.max(0, MAX_BRACELETS_PER_OPERATOR - created),
+    today: getTodayCreatedCount(operatorId),
+    total: operator ? operator.braceletsCreated : 0,
+    maxPerBatch: Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH),
   };
 }
 
@@ -47,7 +49,15 @@ function summarizeJob(job) {
     else if (g.status === BRACELET_STATUS.RECONCILIATION_REQUIRED) counts.reconciliationRequired += 1;
     else counts.pending += 1;
   });
-  return { ...job, guestCounts: counts, guestIds: guests.map((g) => g.id) };
+  return {
+    ...job,
+    guestCounts: counts,
+    guestIds: guests.map((g) => g.id),
+    // The IDs this batch actually claimed, straight from the mock
+    // "database" — never generated in this file, never in React. Swap for
+    // whatever the real POST /api/v1/jobs response returns.
+    braceletNumbers: guests.map((g) => g.braceletNumber),
+  };
 }
 
 // Real endpoint: POST /api/v1/jobs (Idempotency-Key header required)
@@ -61,9 +71,10 @@ export async function createJob({ quantity, operatorId, idempotencyKey }) {
   const existing = jobs.find((j) => j.idempotencyKey === idempotencyKey);
   if (existing) return summarizeJob(existing);
 
-  const remaining = MAX_BRACELETS_PER_OPERATOR - operator.braceletsCreated;
-  if (quantity > remaining) {
-    throw new ApiError('ALLOWANCE_EXCEEDED', `Exceeds remaining allowance of ${remaining}.`, 409);
+  // Per-batch cap only — deliberately no lifetime or daily check here.
+  const batchMax = Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH);
+  if (quantity < 1 || quantity > batchMax) {
+    throw new ApiError('BATCH_LIMIT_EXCEEDED', `Quantity must be between 1 and ${batchMax} per batch.`, 409);
   }
 
   const claimed = claimPendingGuests(quantity);
@@ -104,6 +115,7 @@ export async function createJob({ quantity, operatorId, idempotencyKey }) {
     });
   });
 
+  // Lifetime "Total Created" stat only — never enforced as a limit anywhere.
   operator.braceletsCreated += quantity;
 
   runJobPipeline(job);
