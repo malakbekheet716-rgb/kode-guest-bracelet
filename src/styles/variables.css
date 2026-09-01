@@ -1,0 +1,64 @@
+:root {
+  /* Base palette */
+  --color-ink: #17171a;
+  --color-bg: #f6f6f4;
+  --color-surface: #ffffff;
+  --color-border: #e3e3df;
+  --color-muted: #6b6b70;
+  --color-muted-2: #9a9a9f;
+
+  /* KODE brand spectrum, repurposed as the bracelet status vocabulary */
+  --color-blue: #0072bc; /* structural / QUEUED */
+  --color-orange: #f26522; /* primary CTA / LOST */
+  --color-lime: #7a9926; /* ISSUED (deepened for AA contrast on white) */
+  --color-purple: #7f3f98; /* ACTIVE */
+  --color-pink: #ed0c6e; /* FAILED */
+  --color-yellow: #b8860b; /* RECONCILIATION_REQUIRED (deepened) */
+  --color-charcoal: #3f3f46; /* REVOKED / PENDING */
+
+  --color-danger: var(--color-pink);
+  --color-warning: var(--color-yellow);
+  --color-success: var(--color-lime);
+
+  /* Type */
+  --font-display: 'Archivo', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  --font-body: 'IBM Plex Sans', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+
+  /* Scale */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --shadow-sm: 0 1px 2px rgba(23, 23, 26, 0.06);
+  --shadow-md: 0 4px 16px rgba(23, 23, 26, 0.08);
+
+  --header-height: 64px;
+  --surface-mix-base: white;
+}
+
+[dir='rtl'] {
+  --font-display: 'IBM Plex Sans Arabic', 'Archivo', 'Segoe UI', sans-serif;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-ink: #f2f2f0;
+  --color-bg: #121214;
+  --color-surface: #1b1b1e;
+  --color-border: #303034;
+  --color-muted: #a8a8ad;
+  --color-muted-2: #7a7a80;
+
+  --surface-mix-base: #1b1b1e;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
