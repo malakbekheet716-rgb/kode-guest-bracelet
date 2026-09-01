@@ -17,13 +17,11 @@ export function getOperatorLabel(operatorId) {
 
 export async function getCreationStats(employeeId) {
   await simulateLatency(80, 180);
-  const total = jobs
-    .filter((j) => j.requestedBy === employeeId)
-    .reduce((sum, j) => sum + j.quantity, 0);
+  const total = jobs.filter((j) => j.requestedBy === employeeId).reduce((sum, j) => sum + j.quantity, 0);
   return {
     today: getTodayCreatedCount(employeeId),
     total,
-    maxPerBatch: Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH),
+    maxPerBatch: Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH, 30),
   };
 }
 
@@ -52,19 +50,23 @@ export async function createJob({ quantity, operatorId, operatorName, idempotenc
 
   const employeeId = String(operatorId || '').trim();
   const employeeName = String(operatorName || '').trim();
-  if (!employeeId || !employeeName) throw new ApiError('UNAUTHENTICATED', 'Employee identity is required.', 401);
+  if (!employeeId || !employeeName) {
+    throw new ApiError('UNAUTHENTICATED', 'Employee identity is required.', 401);
+  }
 
-  const existing = jobs.find((j) => j.idempotencyKey === idempotencyKey);
+  const existing = idempotencyKey && jobs.find((j) => j.idempotencyKey === idempotencyKey);
   if (existing) return summarizeJob(existing);
 
-  const batchMax = Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH);
-  if (quantity < 1 || quantity > batchMax) {
+  const batchMax = Math.min(MAX_GUESTS_PER_JOB, MAX_BRACELETS_PER_BATCH, 30);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > batchMax) {
     throw new ApiError('BATCH_LIMIT_EXCEEDED', `Quantity must be between 1 and ${batchMax} per batch.`, 409);
   }
 
   const claimed = claimPendingGuests(quantity);
   if (claimed.length < quantity) {
-    throw new ApiError('INSUFFICIENT_GUESTS', `Only ${claimed.length} pending guests available.`, 409);
+    const error = new ApiError('INSUFFICIENT_GUESTS', 'Not enough pending bracelets are available.', 409);
+    error.available = claimed.length;
+    throw error;
   }
 
   const job = {
