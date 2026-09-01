@@ -65,7 +65,8 @@ export default {
   dashboard: {
     title: 'لوحة التحكم',
     welcomeBack: 'مرحباً بعودتك، {{name}}',
-    created: 'تم إنشاؤها',
+    created: 'إجمالي ما تم إنشاؤه',
+todayCreated: 'تم إنشاؤها اليوم',
     remaining: 'المتبقي',
     max: 'الحد المسموح',
     createCta: 'إنشاء سوار ضيف',
@@ -82,7 +83,7 @@ export default {
     title: 'إنشاء سوار ضيف',
     subtitle: 'أدخل عدد أساور الضيوف المطلوب إصدارها الآن.',
     quantityLabel: 'عدد الأساور',
-    quantityHelp: 'بحد أقصى {{max}} لكل طلب.',
+    quantityHelp: 'بحد أقصى {{max}} سوارًا لكل دفعة.',
     remainingNote: 'لديك {{remaining}} متبقية من الحد المسموح به وهو {{max}}.',
     submitButton: 'إنشاء الطلب',
     submitting: 'جارٍ إنشاء الطلب…',
@@ -205,6 +206,6 @@ export default {
     passwordMismatch: 'كلمتا المرور غير متطابقتين.',
     invalidQuantity: 'أدخل رقماً صحيحاً.',
     quantityTooLow: 'أدخل رقماً لا يقل عن 1.',
-    quantityTooHigh: 'الحد الأقصى هو {{max}} لكل طلب.',
+    quantityTooHigh: 'الحد الأقصى هو {{max}} سوارًا لكل دفعة.',
   },
 };

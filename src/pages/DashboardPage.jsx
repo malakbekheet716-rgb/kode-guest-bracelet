@@ -16,16 +16,16 @@ export default function DashboardPage() {
   const { t, lang } = useLocale();
   const navigate = useNavigate();
 
-  const [allowance, setAllowance] = useState(null);
+  const [stats, setStats] = useState(null);
   const [jobs, setJobs] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const [allowanceRes, jobsRes] = await Promise.all([
-      jobsApi.getAllowance(operator.id),
+    const [statsRes, jobsRes] = await Promise.all([
+      jobsApi.getCreationStats(operator.id),
       jobsApi.getJobs({ requestedBy: operator.id, page: 1, pageSize: 100 }),
     ]);
-    setAllowance(allowanceRes);
+    setStats(statsRes);
     setJobs(jobsRes.items);
     setLoading(false);
   }, [operator.id]);
@@ -38,7 +38,6 @@ export default function DashboardPage() {
 
   const attentionJobs = (jobs || []).filter((j) => j.status === 'FAILED' || j.needsAttention);
   const recentJobs = (jobs || []).slice(0, 6);
-  const limitReached = allowance && allowance.remaining <= 0;
 
   return (
     <div>
@@ -51,29 +50,12 @@ export default function DashboardPage() {
       ) : (
         <>
           <div className="stat-grid">
-            <StatCard label={t('dashboard.created')} value={allowance.created} color="var(--color-blue)" />
-            <StatCard
-              label={t('dashboard.remaining')}
-              value={allowance.remaining}
-              color={limitReached ? 'var(--color-pink)' : 'var(--color-lime)'}
-            />
-            <StatCard label={t('dashboard.max')} value={allowance.max} color="var(--color-charcoal)" />
+            <StatCard label={t('dashboard.todayCreated')} value={stats.today} color="var(--color-blue)" />
+            <StatCard label={t('dashboard.created')} value={stats.total} color="var(--color-lime)" />
           </div>
 
-          {limitReached && (
-            <div className="banner banner--warning">
-              {t('dashboard.limitReachedBanner', { max: allowance.max })}
-            </div>
-          )}
-
           <div className="mt-4" style={{ marginBottom: 'var(--space-6)' }}>
-            <Button
-              variant="primary"
-              size="lg"
-              block
-              disabled={limitReached}
-              onClick={() => navigate('/create')}
-            >
+            <Button variant="primary" size="lg" block onClick={() => navigate('/create')}>
               + {t('dashboard.createCta')}
             </Button>
           </div>

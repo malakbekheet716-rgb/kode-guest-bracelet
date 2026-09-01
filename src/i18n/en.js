@@ -66,7 +66,8 @@ export default {
   dashboard: {
     title: 'Dashboard',
     welcomeBack: 'Welcome back, {{name}}',
-    created: 'Created',
+    created: 'Total Created',
+    todayCreated: "Today's Created",
     remaining: 'Remaining',
     max: 'Allowance',
     createCta: 'Create Guest Bracelet',
@@ -84,7 +85,7 @@ export default {
     title: 'Create Guest Bracelet',
     subtitle: 'Enter how many guest bracelets to issue right now.',
     quantityLabel: 'Number of bracelets',
-    quantityHelp: 'Up to {{max}} per job.',
+    quantityHelp: 'Up to {{max}} bracelets per batch.',
     remainingNote: 'You have {{remaining}} remaining out of your allowance of {{max}}.',
     submitButton: 'Create job',
     submitting: 'Creating job…',
@@ -208,6 +209,6 @@ export default {
     passwordMismatch: 'Passwords do not match.',
     invalidQuantity: 'Enter a whole number.',
     quantityTooLow: 'Enter at least 1.',
-    quantityTooHigh: 'Maximum is {{max}} per job.',
+    quantityTooHigh: 'Maximum {{max}} bracelets per batch.',
   },
 };

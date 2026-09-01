@@ -16,6 +16,25 @@ function pad(n, len = 6) {
   return String(n).padStart(len, '0');
 }
 
+function isSameCalendarDay(a, b) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+// "Today" is derived from job.createdAt so it survives a refresh instead of
+// living only in React state — ready to become a real
+// `WHERE requested_by = ? AND created_at::date = CURRENT_DATE` query once
+// the backend is connected.
+export function getTodayCreatedCount(operatorId) {
+  const now = new Date();
+  return jobs
+    .filter((j) => j.requestedBy === operatorId && isSameCalendarDay(new Date(j.createdAt), now))
+    .reduce((sum, j) => sum + j.quantity, 0);
+}
+
 export const operators = [
   {
     id: 'op_demo_operator',
@@ -322,4 +341,4 @@ export function runJobPipeline(job) {
   }, 1200);
 }
 
-export { writeEvent, nextId };
+export { writeEvent, nextId, getTodayCreatedCount };
