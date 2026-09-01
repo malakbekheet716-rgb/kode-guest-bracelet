@@ -8,6 +8,7 @@ import { BraceletStatusBadge } from '../components/ui/StatusBadge';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import { SkeletonRows } from '../components/ui/Skeleton';
+import { usePolling } from '../hooks/usePolling';
 import { BRACELET_STATUS, ROLES } from '../utils/constants';
 import { formatDateTime } from '../utils/formatters';
 
@@ -61,7 +62,7 @@ export default function BraceletDetailPage() {
         {bracelet.status === BRACELET_STATUS.RECONCILIATION_REQUIRED && <Button variant="primary" onClick={() => setModal('reconcile')}>{t('braceletDetail.reconcileButton')}</Button>}
         {bracelet.status === BRACELET_STATUS.ISSUED && <Button variant="secondary" onClick={() => handleStatusChange(BRACELET_STATUS.ACTIVE)}>{t('braceletDetail.markActive')}</Button>}
         {bracelet.status === BRACELET_STATUS.ACTIVE && <><Button variant="secondary" onClick={() => handleStatusChange(BRACELET_STATUS.LOST)}>{t('braceletDetail.markLost')}</Button><Button variant="danger" onClick={() => setModal('revoke')} disabled={!isAdmin} title={!isAdmin ? t('braceletDetail.adminOnly') : undefined}>{t('braceletDetail.markRevoked')}{!isAdmin && ` (${t('braceletDetail.adminOnly')})`}</Button></>}
-        {[BRACELET_STATUS.FAILED, BRACELET_STATUS.RECONCILIATION_REQUIRED, BRACELET_STATUS.ISSUED, BRACELET_STATUS.ACTIVE].includes(bracelet.status) || <span className="text-sm text-muted">{t('common.none')}</span>}
+        {![BRACELET_STATUS.FAILED, BRACELET_STATUS.RECONCILIATION_REQUIRED, BRACELET_STATUS.ISSUED, BRACELET_STATUS.ACTIVE].includes(bracelet.status) && <span className="text-sm text-muted">{t('common.none')}</span>}
       </div></div>
       <div className="section"><div className="section__title">{t('braceletDetail.eventHistory')}</div>{bracelet.events.length === 0 ? <p className="text-muted text-sm">{t('braceletDetail.noEvents')}</p> : <div className="table-wrap"><table className="table"><tbody>{[...bracelet.events].reverse().map((ev) => <tr key={ev.id}><td className="text-muted" style={{ whiteSpace: 'nowrap' }}>{formatDateTime(ev.createdAt, lang)}</td><td>{ev.eventType}</td><td className="text-muted">{ev.triggeredByName ? `${ev.triggeredByName} (${ev.employeeId || ev.triggeredBy})` : ev.triggeredBy}</td><td className="text-muted">{ev.oldStatus ? `${ev.oldStatus} → ${ev.newStatus}` : ev.newStatus}</td></tr>)}</tbody></table></div>}</div>
       <Button variant="ghost" onClick={() => navigate(-1)}>{t('common.back')}</Button>
