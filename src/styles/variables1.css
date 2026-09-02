@@ -1,33 +1,58 @@
+/* ==========================================================================
+   KODE SPORTS CLUB — DESIGN SYSTEM TOKENS
+   Exact Brand Palette from KODE Brand Book
+   ========================================================================== */
+
 :root {
-  /* Base palette */
-  --color-ink: #17171a;
-  --color-bg: #f6f6f4;
+  /* Official KODE Brand Palette */
+  --kode-blue: #244ea2;
+  --kode-blue-vibrant: #0072bc;
+  --kode-orange: #f26522;
+  --kode-lime: #bfd730;
+  --kode-lime-deep: #7a9926; /* Deepened for WCAG AA contrast on white */
+  --kode-purple: #7f3f98;
+  --kode-pink: #ed0c6e;
+  --kode-yellow: #fec20e;
+  --kode-yellow-deep: #b8860b;
+
+  /* Neutrals & Surfaces (Light Mode) */
+  --color-ink: #0f172a;
+  --color-bg: #f8fafc;
   --color-surface: #ffffff;
-  --color-border: #e3e3df;
-  --color-muted: #6b6b70;
-  --color-muted-2: #9a9a9f;
+  --color-surface-hover: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-subtle: #edf2f7;
+  --color-muted: #64748b;
+  --color-muted-2: #94a3b8;
 
-  /* KODE brand spectrum, repurposed as the bracelet status vocabulary */
-  --color-blue: #0072bc; /* structural / QUEUED */
-  --color-orange: #f26522; /* primary CTA / LOST */
-  --color-lime: #7a9926; /* ISSUED (deepened for AA contrast on white) */
-  --color-purple: #7f3f98; /* ACTIVE */
-  --color-pink: #ed0c6e; /* FAILED */
-  --color-yellow: #b8860b; /* RECONCILIATION_REQUIRED (deepened) */
-  --color-charcoal: #3f3f46; /* REVOKED / PENDING */
+  /* Operational Status Mapping */
+  --color-pending: #64748b;
+  --color-queued: var(--kode-blue);
+  --color-issued: var(--kode-lime-deep);
+  --color-active: var(--kode-purple);
+  --color-failed: var(--kode-pink);
+  --color-reconciliation: var(--kode-yellow-deep);
+  --color-revoked: #334155;
+  --color-lost: var(--kode-orange);
 
-  --color-danger: var(--color-pink);
-  --color-warning: var(--color-yellow);
-  --color-success: var(--color-lime);
+  --color-primary: var(--kode-blue);
+  --color-accent: var(--kode-orange);
+  --color-danger: var(--kode-pink);
+  --color-warning: var(--kode-yellow-deep);
+  --color-success: var(--kode-lime-deep);
 
-  /* Type */
-  --font-display: 'Archivo', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
-  --font-body: 'IBM Plex Sans', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  /* Typography */
+  --font-display: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Montserrat', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Montserrat', sans-serif;
 
-  /* Scale */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  /* Layout & Elevation */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -36,12 +61,48 @@
   --space-6: 32px;
   --space-7: 48px;
 
-  --shadow-sm: 0 1px 2px rgba(23, 23, 26, 0.06);
-  --shadow-md: 0 4px 16px rgba(23, 23, 26, 0.08);
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 10px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 40px -8px rgba(15, 23, 42, 0.12), 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-glow-blue: 0 0 24px rgba(36, 78, 162, 0.25);
+  --shadow-glow-orange: 0 0 24px rgba(242, 101, 34, 0.3);
 
-  --header-height: 64px;
+  --header-height: 68px;
 }
 
 [dir='rtl'] {
-  --font-display: 'IBM Plex Sans Arabic', 'Archivo', 'Segoe UI', sans-serif;
+  --font-display: 'IBM Plex Sans Arabic', 'Montserrat', sans-serif;
+  --font-body: 'IBM Plex Sans Arabic', 'Montserrat', sans-serif;
+}
+
+/* ==========================================================================
+   Dark Theme (High-Contrast Kinetic Dark Mode)
+   ========================================================================== */
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-ink: #f8fafc;
+  --color-bg: #0b0f19;
+  --color-surface: #131b2e;
+  --color-surface-hover: #1a253e;
+  --color-border: #1e293b;
+  --color-border-subtle: #162035;
+  --color-muted: #94a3b8;
+  --color-muted-2: #64748b;
+
+  --color-pending: #94a3b8;
+  --color-queued: #3b82f6;
+  --color-issued: #a3e635;
+  --color-active: #c084fc;
+  --color-failed: #f43f5e;
+  --color-reconciliation: #facc15;
+  --color-revoked: #64748b;
+  --color-lost: #fb923c;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 12px 36px -4px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+  --shadow-lg: 0 24px 48px -6px rgba(0, 0, 0, 0.75);
 }

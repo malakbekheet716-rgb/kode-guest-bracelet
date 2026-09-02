@@ -1,28 +1,40 @@
 :root {
+  /* Exact KODE Brand Palette from PDF */
+  --kode-purple: #7f3f98;       /* C 60 / M 80 / Y 00 / K 00 -> R 127 / G 63 / B 152 */
+  --kode-orange: #f26522;       /* C 00 / M 75 / Y 100 / K 00 -> R 242 / G 101 / B 34 */
+  --kode-lime: #bfd730;         /* C 30 / M 00 / Y 100 / K 00 -> R 191 / G 215 / B 48 */
+  --kode-lime-deep: #7a9926;    /* Deepened for WCAG AA text contrast on light */
+  --kode-pink: #ed0c6e;         /* C 00 / M 100 / Y 30 / K 00 -> R 237 / G 12 / B 110 */
+  --kode-yellow: #fec20e;       /* C 00 / M 25 / Y 100 / K 00 -> R 254 / G 194 / B 15 */
+  --kode-yellow-deep: #b8860b;  /* Deepened for WCAG AA text contrast */
+  --kode-blue: #244ea2;         /* C 95 / M 80 / Y 00 / K 00 -> R 00 / G 114 / B 188 */
+
   /* Base palette */
   --color-ink: #17171a;
-  --color-bg: #f6f6f4;
+  --color-bg: #f8f7fa;
   --color-surface: #ffffff;
-  --color-border: #e3e3df;
-  --color-muted: #6b6b70;
-  --color-muted-2: #9a9a9f;
+  --color-border: #e6e4ed;
+  --color-muted: #6b6a78;
+  --color-muted-2: #9a98a6;
 
-  /* KODE brand spectrum, repurposed as the bracelet status vocabulary */
-  --color-blue: #0072bc; /* structural / QUEUED */
-  --color-orange: #f26522; /* primary CTA / LOST */
-  --color-lime: #7a9926; /* ISSUED (deepened for AA contrast on white) */
-  --color-purple: #7f3f98; /* ACTIVE */
-  --color-pink: #ed0c6e; /* FAILED */
-  --color-yellow: #b8860b; /* RECONCILIATION_REQUIRED (deepened) */
-  --color-charcoal: #3f3f46; /* REVOKED / PENDING */
+  /* KODE brand spectrum mapped to statuses */
+  --color-purple: var(--kode-purple);
+  --color-orange: var(--kode-orange);
+  --color-lime: var(--kode-lime-deep);
+  --color-pink: var(--kode-pink);
+  --color-yellow: var(--kode-yellow-deep);
+  --color-blue: var(--kode-blue);
+  --color-charcoal: #3f3f46;
 
-  --color-danger: var(--color-pink);
-  --color-warning: var(--color-yellow);
-  --color-success: var(--color-lime);
+  --color-primary: var(--kode-purple);
+  --color-brand: var(--kode-purple);
+  --color-danger: var(--kode-pink);
+  --color-warning: var(--kode-yellow-deep);
+  --color-success: var(--kode-lime-deep);
 
-  /* Type */
-  --font-display: 'Montserrat', 'Archivo', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
-  --font-body: 'Montserrat', 'IBM Plex Sans', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  /* Typography */
+  --font-display: 'Montserrat', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Montserrat', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Scale */
   --radius-sm: 6px;
@@ -36,29 +48,32 @@
   --space-6: 32px;
   --space-7: 48px;
 
-  --shadow-sm: 0 1px 2px rgba(23, 23, 26, 0.06);
-  --shadow-md: 0 4px 16px rgba(23, 23, 26, 0.08);
+  --shadow-sm: 0 1px 3px rgba(23, 23, 26, 0.06);
+  --shadow-md: 0 4px 16px rgba(127, 63, 152, 0.08), 0 2px 6px rgba(23, 23, 26, 0.04);
+  --shadow-lg: 0 12px 32px -4px rgba(127, 63, 152, 0.12), 0 4px 12px rgba(23, 23, 26, 0.05);
 
   --header-height: 64px;
   --surface-mix-base: white;
 }
 
 [dir='rtl'] {
-  --font-display: 'IBM Plex Sans Arabic', 'Archivo', 'Segoe UI', sans-serif;
+  --font-display: 'IBM Plex Sans Arabic', 'Montserrat', sans-serif;
+  --font-body: 'IBM Plex Sans Arabic', 'Montserrat', sans-serif;
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
 
   --color-ink: #f2f2f0;
-  --color-bg: #121214;
-  --color-surface: #1b1b1e;
-  --color-border: #303034;
-  --color-muted: #a8a8ad;
-  --color-muted-2: #7a7a80;
+  --color-bg: #110e17;
+  --color-surface: #1b1724;
+  --color-border: #2d263b;
+  --color-muted: #a8a4b8;
+  --color-muted-2: #7a768a;
 
-  --surface-mix-base: #1b1b1e;
+  --surface-mix-base: #1b1724;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
 }
