@@ -28,7 +28,7 @@ export default function Navbar() {
       }
     }
     poll();
-    const interval = setInterval(poll, 10000);
+    const interval = setInterval(poll, 5000);
     return () => {
       cancelled = true;
       clearInterval(interval);

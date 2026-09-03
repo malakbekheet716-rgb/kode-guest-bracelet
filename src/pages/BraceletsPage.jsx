@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocale } from '../i18n/LocaleContext';
 import * as braceletsApi from '../api/braceletsApi';
 import BraceletTable from '../components/bracelets/BraceletTable';
@@ -20,21 +20,28 @@ export default function BraceletsPage() {
     setPage(1);
   }, [search, status]);
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    braceletsApi
-      .getBracelets({ braceletNumber: search || undefined, status: status || undefined, page, pageSize: PAGE_SIZE })
-      .then((res) => {
-        if (!cancelled) {
-          setResult(res);
-          setLoading(false);
-        }
+  const load = useCallback(async () => {
+    try {
+      const res = await braceletsApi.getBracelets({
+        braceletNumber: search || undefined,
+        status: status || undefined,
+        page,
+        pageSize: PAGE_SIZE,
       });
-    return () => {
-      cancelled = true;
-    };
+      setResult(res);
+    } catch {
+      // keep existing results on transient network tick
+    } finally {
+      setLoading(false);
+    }
   }, [search, status, page]);
+
+  useEffect(() => {
+    setLoading(true);
+    load();
+    const interval = setInterval(load, 5000);
+    return () => clearInterval(interval);
+  }, [load]);
 
   const totalPages = result ? Math.max(1, Math.ceil(result.total / PAGE_SIZE)) : 1;
 
